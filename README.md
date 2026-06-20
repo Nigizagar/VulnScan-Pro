@@ -1,0 +1,24 @@
+# 🛡️ VulnScan Pro
+
+**VulnScan Pro** adalah framework *network reconnaissance* dan *vulnerability scanner* ringan yang dikembangkan dengan Python & Flask. Dibuat secara khusus untuk keperluan portofolio, edukasi keamanan siber, dan *legal pentesting*.
+
+## 🚀 Fitur Utama
+- **Fast Port Scanning:** Menggunakan multithreading (`ThreadPoolExecutor`).
+- **Service & Banner Grabbing:** Identifikasi service dan banner extraction secara otomatis.
+- **HTTP Analysis:** Mengekstrak *Server Headers* dan *Status Codes* dari target web.
+- **Reporting Engine:** Ekspor hasil ke format CSV dan PDF.
+- **Modern Dashboard:** UI berbasis Flask, Bootstrap 5 Dark Mode, dan Chart.js.
+- **Background Tasks:** Memproses scan secara *asynchronous* dengan AJAX real-time updates.
+
+## 🛠️ Arsitektur Proyek
+- **Backend:** Flask, Flask-SQLAlchemy, Flask-Limiter
+- **Scanner Core:** Pure Python `socket` & `requests` (Tidak bergantung pada Nmap binary)
+- **Database:** SQLite3
+- **Frontend:** HTML5, Bootstrap 5, Vanilla JS, Chart.js
+
+## ⚙️ Cara Instalasi & Menjalankan
+
+1. **Clone repository ini**
+   ```bash
+   git clone [https://github.com/yourusername/vulnscan-pro.git](https://github.com/yourusername/vulnscan-pro.git)
+   cd vulnscan-pro

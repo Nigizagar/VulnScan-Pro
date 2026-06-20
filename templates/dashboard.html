@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <pre class="text-danger fw-bold" style="font-family: monospace; font-size: 12px;">
+ __      __        _       _____                     _____           
+ \ \    / /       | |     / ____|                   |  __ \          
+  \ \  / /   _  __| |____| (___   ___ __ _ _ __     | |__) | __ ___  
+   \ \/ / | | |/ _` |______\___ \ / __/ _` | '_ \   |  ___/ '__/ _ \ 
+    \  /| |_| | (_| |      ____) | (_| (_| | | | |  | |   | | | (_) |
+     \/  \__,_|\__,_|     |_____/ \___\__,_|_| |_|  |_|   |_|  \___/ 
+        </pre>
+        <p class="text-muted">Professional Network Reconnaissance Framework</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Total Scans</h5>
+                <h2 class="text-info">{{ total_scans }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Completed</h5>
+                <h2 class="text-success">{{ completed_scans }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Open Ports Found</h5>
+                <h2 class="text-warning">{{ total_ports }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header bg-dark border-secondary">Recent Scans</div>
+            <ul class="list-group list-group-flush">
+                {% for scan in recent_scans %}
+                <li id="scan-row-{{ scan.id }}" class="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center">
+            <div>
+        <strong class="text-info">{{ scan.target_info.target }}</strong>
+        <span class="badge {% if scan.status == 'Completed' %}bg-success{% elif scan.status == 'Running' %}bg-warning text-dark{% else %}bg-danger{% endif %} rounded-pill ms-2">
+            {{ scan.status }}
+        </span>
+    </div>
+    
+    <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteHistory('{{ scan.id }}')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0A.5.5 0 0 1 8 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+        </svg>
+         </button>
+            </li>
+                {% endfor %}
+                {% if not recent_scans %}
+                <li class="list-group-item bg-dark text-muted border-secondary text-center">No recent scans found</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body">
+                <canvas id="scanChart" 
+                        data-completed="{{ completed_scans }}" 
+                        data-total="{{ total_scans }}">
+                </canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const chartElement = document.getElementById('scanChart');
+    
+    if (chartElement) {
+        const completedScans = parseInt(chartElement.getAttribute('data-completed')) || 0;
+        const totalScans = parseInt(chartElement.getAttribute('data-total')) || 0;
+        const failedOrRunning = totalScans - completedScans;
+
+        new Chart(chartElement, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Failed/Running'],
+                datasets: [{
+                    data: [completedScans, failedOrRunning],
+                    backgroundColor: ['#198754', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false 
+            }
+        });
+    }
+    function deleteHistory(scanId) {
+    if (confirm("Apakah Anda yakin ingin menghapus riwayat pemindaian ini?")) {
+        fetch(`/api/delete/${scanId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Efek animasi menghapus baris dari layar tanpa reload
+                const row = document.getElementById(`scan-row-${scanId}`);
+                if (row) {
+                    row.style.transition = "all 0.5s ease";
+                    row.style.opacity = "0";
+                    setTimeout(() => {
+                        row.remove();
+                        // Opsional: Muat ulang halaman agar grafik Chart.js ikut terupdate
+                        location.reload();
+                    }, 500);
+                }
+            } else {
+                alert("Gagal menghapus: " + data.message);
+            }
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            alert("Terjadi kesalahan sistem.");
+        });
+    }
+} 
+</script>
+
+
+
+{% endblock %}

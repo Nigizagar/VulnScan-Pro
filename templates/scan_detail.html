@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Scan Results: <span class="text-info">{{ scan.target_info.target }}</span></h2>
+    <div>
+        <a href="/export/csv/{{ scan.id }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv"></i> CSV</a>
+        <a href="/export/pdf/{{ scan.id }}" class="btn btn-sm btn-outline-danger"><i class="bi bi-filetype-pdf"></i> PDF</a>
+    </div>
+</div>
+
+<div class="card bg-dark border-secondary mb-4">
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-4">
+                <p class="text-muted mb-1">Status</p>
+                <h5 id="scan-status" class="{% if scan.status == 'Completed' %}text-success{% else %}text-warning{% endif %}">{{ scan.status }}</h5>
+            </div>
+            <div class="col-4">
+                <p class="text-muted mb-1">Time</p>
+                <h5>{{ scan.scan_time.strftime('%Y-%m-%d %H:%M') }}</h5>
+            </div>
+            <div class="col-4">
+                <p class="text-muted mb-1">Open Ports</p>
+                <h5 id="scan-ports" class="text-danger">{{ scan.total_open_ports }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-dark table-hover table-bordered border-secondary">
+    <thead>
+        <tr>
+            <th>Port</th>
+            <th>State</th>
+            <th>Service</th>
+            <th>Banner</th>
+            <th>HTTP Header (Server)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for port in ports %}
+        <tr>
+            <td><span class="badge bg-secondary">{{ port.port }}/tcp</span></td>
+            <td><span class="text-success fw-bold">{{ port.state }}</span></td>
+            <td>{{ port.service }}</td>
+            <td><small class="text-muted">{{ port.banner }}</small></td>
+            <td><small>{{ port.http_server or '-' }} <span class="badge bg-dark">{{ port.http_status or '' }}</span></small></td>
+        </tr>
+        {% endfor %}
+        {% if not ports %}
+        <tr><td colspan="5" class="text-center text-muted">No open ports found or scan is still running...</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<div id="scan-metadata" data-id="{{ scan.id }}" data-status="{{ scan.status }}"></div>
+
+<script>
+    const metaElement = document.getElementById('scan-metadata');
+    const scanId = metaElement.getAttribute('data-id');
+    let currentStatus = metaElement.getAttribute('data-status');
+    
+    if(currentStatus === 'Running') {
+        const interval = setInterval(() => {
+            fetch(`/api/status/${scanId}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('scan-status').innerText = data.status;
+                    if(data.status === 'Completed' || data.status.includes('Failed')) {
+                        clearInterval(interval);
+                        location.reload();
+                    }
+                });
+        }, 3000);
+    }
+</script>
+{% endblock %}

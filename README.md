@@ -20,5 +20,5 @@
 
 1. **Clone repository ini**
    ```bash
-   git clone [https://github.com/yourusername/vulnscan-pro.git](https://github.com/yourusername/vulnscan-pro.git)
+   git clone https://github.com/Nigizagar/VulnScan-Pro.git
    cd vulnscan-pro

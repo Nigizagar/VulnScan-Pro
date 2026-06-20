@@ -16,6 +16,29 @@
 - **Database:** SQLite3
 - **Frontend:** HTML5, Bootstrap 5, Vanilla JS, Chart.js
 
+## 📸 Pratinjau Aplikasi
+
+### 🖥️ Dashboard Utama
+Halaman dashboard menampilkan ringkasan statistik pemindaian jaringan, status *real-time* tugas pemindaian, serta grafik donat interaktif yang memetakan efisiensi hasil kerja.
+![Dashboard VulnScan Pro]
+<p align="center">
+  <img src="docs-assets/beranda.png" alt="Dashboard" width="80%">
+</p>
+
+### ⏳ Riwayat Pemindaian (Scan History)
+Fitur manajemen riwayat pemindaian yang memungkinkan pengguna memantau data lama, melacak jumlah port yang terbuka, serta menghapus log pemindaian secara dinamis.
+![Scan History VulnScan Pro]
+<p align="center">
+  <img src="docs-assets/history.png" alt="Dashboard" width="80%">
+</p>
+
+### 📄 Ekspor Laporan PDF (Security Report)
+Hasil cetak laporan otomatis dalam format PDF yang menyajikan detail *port scanning*, mendeteksi jenis *service*, melakukan *banner grabbing*, serta mengurai informasi web server secara taktis.
+![PDF Report VulnScan Pro]
+<p align="center">
+  <img src="docs-assets/pdf-report.png" alt="Dashboard" width="80%">
+</p>
+
 ## ⚙️ Cara Instalasi & Menjalankan
 
 1. **Clone repository ini**
